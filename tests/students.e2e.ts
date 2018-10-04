@@ -41,3 +41,5 @@ test('new and existing student form error messages display correctly', async (t)
     .expect(studentPage.saveButton.hasAttribute('disabled'))
     .ok();
 });
+
+test('teacher should show only students that are in his class', async (t) => {});

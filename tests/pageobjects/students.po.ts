@@ -12,7 +12,7 @@ export default class StudentsPage {
   lastName: Selector;
   username: Selector;
   classId: Selector;
-  classIdFirstOption: Selector;
+  classIdOption: Selector;
   password: Selector;
   firstNameErr: Selector;
   lastNameErr: Selector;
@@ -20,8 +20,8 @@ export default class StudentsPage {
   usernameFormatErr: Selector;
   classIdErr: Selector;
   passwordErr: Selector;
-  scheduleTestUserNameCell: Selector;
-  scheduleTestUserDeleteButton: Selector;
+  studentNameCell: Selector;
+  deleteStudentButton: Selector;
   confirmDeleteButton: Selector;
   scheduleCell: Selector;
   editCellDialogue: Selector;
@@ -31,6 +31,7 @@ export default class StudentsPage {
   locationOption: Selector;
   editCellUpdateButton: Selector;
   editCellCloseButton: Selector;
+
   constructor() {
     this._id = Selector('[data-test-id$="students-page"]');
     this.newStudentButton = Selector('[data-test-id$="new-student-button"]');
@@ -42,7 +43,7 @@ export default class StudentsPage {
     this.firstName = Selector('[name$="firstname"]');
     this.lastName = Selector('[name$="lastname"]');
     this.classId = Selector('[name$="class_id"]');
-    this.classIdFirstOption = Selector('[class="mat-option-text"]').withExactText('טיטאן');
+    this.classIdOption = Selector('[class="mat-option-text"]');
     this.password = Selector('[name$="password"]');
     this.usernameErr = Selector('[data-test-id$="username-err"]');
     this.usernameFormatErr = Selector('[data-test-id$="username-format-err"]');
@@ -50,8 +51,7 @@ export default class StudentsPage {
     this.lastNameErr = Selector('[data-test-id$="lastname-err"]');
     this.classIdErr = Selector('[data-test-id$="class-id-err"]');
     this.passwordErr = Selector('[data-test-id$="password-err"]');
-    this.scheduleTestUserNameCell = Selector('.username').withExactText('scheduleTestUser');
-    this.scheduleTestUserDeleteButton = Selector('[data-test-id$="delete-user-button-scheduleTestUser"]');
+    this.studentNameCell = Selector('.username');
     this.confirmDeleteButton = Selector('[id$="confirm-delete-user"');
     this.scheduleCell = Selector('[role$="gridcell"]').nth(10);
     this.editCellDialogue = Selector('[data-test-id$="edit-cell-dialogue"]');
@@ -63,30 +63,38 @@ export default class StudentsPage {
     this.editCellCloseButton = Selector('[data-test-id$="close-edit-lesson-dialogue"]');
   }
 
-  async createNewScheduleTestUser() {
+  async createTestUser(userName: string, className: string) {
+    this.studentNameCell = this.studentNameCell.withExactText(userName);
+    this.deleteStudentButton = Selector('[data-test-id$="delete-user-button-' + userName + '"]');
+    this.classIdOption = this.classIdOption.withExactText(className);
+
     //If the user exists - delete it.
-    if (await this.scheduleTestUserNameCell.exists) {
-      await t.click(this.scheduleTestUserDeleteButton).click(this.confirmDeleteButton);
+    if (await this.studentNameCell.exists) {
+      await t.click(this.deleteStudentButton).click(this.confirmDeleteButton);
     }
     //If the user still exists - fail the test
-    await t.expect(this.scheduleTestUserNameCell.exists).notOk();
+    await t.expect(this.studentNameCell.exists).notOk();
     //Create a new scheduleTestUser
     await t.click(this.newStudentButton);
     await this.firstName();
-    await t.typeText(this.username, 'scheduleTestUser');
-    await t.typeText(this.password, 'scheduleTestUser');
-    await t.typeText(this.firstName, 'scheduleTestUser');
-    await t.typeText(this.lastName, 'scheduleTestUser');
+    await t.typeText(this.username, userName);
+    await t.typeText(this.password, userName);
+    await t.typeText(this.firstName, userName);
+    await t.typeText(this.lastName, userName);
     await t.click(this.classId);
-    await t.click(this.classIdFirstOption);
+    await t.click(this.classIdOption);
     await t.click(this.saveButton);
 
     //user should now exist
-    await t.expect(this.scheduleTestUserNameCell.exists).ok();
+    await t.expect(this.studentNameCell.exists).ok();
+  }
+
+  async createNewScheduleTestUser() {
+    await this.createTestUser('scheduleTestUser', 'טיטאן');
   }
 
   async navigateToScheduleTab() {
-    await t.click(this.scheduleTestUserNameCell);
+    await t.click(this.studentNameCell);
     await t.click(this.scheduleTab);
   }
 
